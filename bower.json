@@ -1,0 +1,23 @@
+{
+  "name": "react-drop",
+  "version": "0.0.1",
+  "homepage": "https://github.com/souporserious/react-drop",
+  "authors": [
+    "Travis Arnold <ftntravis@gmail.com>"
+  ],
+  "description": "Drop content anywhere on the page.",
+  "main": ["./dist/react-drop.js"],
+  "keywords": [
+    "react",
+    "component",
+    "drop"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
