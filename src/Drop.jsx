@@ -1,7 +1,7 @@
 import React, { Component, Children, PropTypes, cloneElement } from 'react'
 import ReactDOM from 'react-dom'
 import Travel from 'react-travel'
-import shallowCompare from 'react/lib/shallowCompare'
+import shallowCompare from 'react-addons-shallow-compare'
 import ResizeHandler from './Resize-Handler'
 import getScrollParent from './get-scroll-parent'
 
