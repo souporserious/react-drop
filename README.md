@@ -1,4 +1,4 @@
-## React Drop 0.1.0
+## React Drop 0.1.1
 
 Drop content anywhere on the page.
 
