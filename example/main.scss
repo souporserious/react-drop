@@ -1,3 +1,17 @@
 * {
   box-sizing: border-box;
 }
+
+body {
+  //height: 2000px
+}
+
+#app {
+  width: 450px;
+  height: 200px;
+  overflow: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
