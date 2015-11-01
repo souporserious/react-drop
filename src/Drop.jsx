@@ -27,10 +27,6 @@ class Drop extends Component {
     }
   }
 
-  _scrollParent = undefined
-  _lastDropRect = null
-  _isPositioning = false
-  _isMounted = false
   state = {
     drop: null,
     dirty: true,
@@ -38,20 +34,29 @@ class Drop extends Component {
     x: 0,
     y: 0
   }
+  _scrollParent = undefined
+  _isPositioning = false
+  _isMounted = false
+  _lastDrop = {}
 
   componentDidMount() {
     const { target } = this.props
 
+    // keep track of us being mounted or not
     this._isMounted = true
 
+    // position the dropped content
     this.position()
 
+    // check if there is a scrollable parent
     this._scrollParent = getScrollParent(target)
 
+    // if so we need to reposition on that parent's scroll
     if (this._scrollParent !== document.body) {
       this._scrollParent.addEventListener('scroll', this.position)
     }
 
+    // reposition on window resize
     resizeHandler.add(this)
   }
 
@@ -61,12 +66,14 @@ class Drop extends Component {
     }
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return shallowCompare(this, nextProps, nextState)
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState)
+  }
 
   componentDidUpdate() {
-    if (this.state.dirty) {
+    if (this.state.dirty ||
+        this._drop.offsetWidth !== this._lastDrop.width &&
+        this._drop.offsetHeight !== this._lastDrop.height) {
       this.position()
     }
   }
@@ -86,23 +93,13 @@ class Drop extends Component {
     const { scrollTop, scrollLeft } = document.body
     const targetRect = target.getBoundingClientRect()
     const dropRect = {
-      width: this.refs.drop.offsetWidth,
-      height: this.refs.drop.offsetHeight
+      width: this._drop.offsetWidth,
+      height: this._drop.offsetHeight
     }
     let x = 0
     let y = 0
 
     this._positioning()
-
-    // if our dimensions have not changed we need to forceUpdate
-    // so we can get the new dimensions
-    // if (this._lastDropRect) {
-    //   if (this._lastDropRect.width === dropRect.width ||
-    //       this._lastDropRect.height === dropRect.height) {
-    //     this.forceUpdate()
-    //     return
-    //   }
-    // }
     
     switch (position) {
       case 'top':
@@ -159,19 +156,18 @@ class Drop extends Component {
     
     this.setState({x, y, dirty: false}, () => {
       // store the last drop so we can compare changes
-      this._lastDropRect = dropRect
+      this._lastDrop = dropRect
     })
   }
 
   _getDimensions() {
     const { scrollTop, scrollLeft } = document.body
-    const { drop } = this.refs
 
     this.setState({
       target: target.getBoundingClientRect(),
       content: {
-        width: drop.offsetWidth,
-        height: drop.offsetHeight
+        width: this._drop.offsetWidth,
+        height: this._drop.offsetHeight
       },
       scrollTop,
       scrollLeft
@@ -206,14 +202,11 @@ class Drop extends Component {
     }
     
     return(
-      <Travel
-        style={style}
-      >
+      <Travel getNode={n => this._drop = n} style={style}>
         {
           cloneElement(
             Children.only(children),
             {
-              ref: 'drop',
               onWheel: (e) => {
                 this.setState({positioning: true})
                 onWheel && onWheel(e)
