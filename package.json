@@ -1,6 +1,6 @@
 {
   "name": "react-drop",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Drop content anywhere on the page.",
   "main": "lib/react-drop.js",
   "scripts": {
