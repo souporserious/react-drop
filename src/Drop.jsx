@@ -45,6 +45,9 @@ class Drop extends Component {
     // keep track of us being mounted or not
     this._isMounted = true
 
+    // bail out if target isn't available yet
+    if (!target) return
+
     // position the dropped content
     this.position()
 
