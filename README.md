@@ -11,7 +11,7 @@ Drop content anywhere on the page.
 ## Example Usage
 
 ```javascript
-import Drop from 'react-drop';
+import Drop from 'react-drop'
 
 class App extends Component {
   state = {
@@ -20,23 +20,27 @@ class App extends Component {
 
   render() {
     return(
+      const { isOpen } = this.state
       <div>
         <button
           ref="trigger"
-          onClick={() => {this.setState({})}}
+          onClick={() => {this.setState({isOpen: !isOpen})}}
         >
-          Trigger Content
+          Toggle Dropped Content
         </button>
-        <Drop
-          target={this.refs.trigger}
-          position="top"
-          align="middle"
-        >
-          <div>
+        {
+          isOpen &&
+          <Drop
+            target={this.refs.trigger}
+            position="top"
+            align="middle"
+          >
+            <div>
               <h2>Dropped Content</h2>
               <p>A paragraph to accompany the title.</p>
-          </div>
-        </Drop>
+            </div>
+          </Drop>
+        }
       </div>
     )
   }
@@ -47,7 +51,7 @@ class App extends Component {
 
 #### `target:` PropTypes.object
 
-Accepts a DOM node which the Drop component is attached to. If getting `undefined` when using `refs`, try adding `forceUpdate` inside your trigger component's did mount lifecycle.
+Accepts a DOM node which the Drop component is attached to.
 
 #### `position:` PropTypes.string
 
@@ -60,6 +64,10 @@ How the Drop component is aligned. Accepts `left`, `middle`, `right`, `top`, or 
 #### `offset:` PropTypes.shape({top: PropTypes.number, left: PropTypes.number})
 
 Adjust the top and/or left offset of where the content is dropped.
+
+## Quirks
+
+With the way React works, there are some quirks. If you need to show the content before the target component is rendered you will need to add a `forceUpdate` inside the target component's `componentDidMount` lifecycle method. If there is another way this can be fixed, I am open to suggestions.
 
 ## Run Example
 
