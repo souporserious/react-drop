@@ -167,7 +167,7 @@ class Drop extends Component {
 
   _scrollHandler = () => {
     if(!this._isTicking) {
-      window.requestAnimationFrame(this.position)
+      requestAnimationFrame(this.position)
     }
     this._isTicking = true
   }

@@ -26,17 +26,17 @@ class ResizeHandler {
   }
 
   _resizeHandler = () => {
-    if(!this.isTicking) {
-      window.requestAnimationFrame(this.update)
+    if(!this._isTicking) {
+      requestAnimationFrame(this.update)
     }
-    this.isTicking = true
+    this._isTicking = true
   }
 
   update = () => {
     for (let i = this._queue.length; i--;) {
       this._queue[i].position()
     }
-    this.isTicking = false
+    this._isTicking = false
   }
 }
 
