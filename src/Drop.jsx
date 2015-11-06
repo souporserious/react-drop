@@ -74,10 +74,16 @@ class Drop extends Component {
   }
 
   componentDidUpdate() {
+    const { offsetWidth, offsetHeight } = this._drop
+
     if (this.state.dirty ||
-        this._drop.offsetWidth !== this._lastDrop.width &&
-        this._drop.offsetHeight !== this._lastDrop.height) {
+        offsetWidth !== this._lastDrop.offsetWidth &&
+        offsetHeight !== this._lastDrop.offsetHeight) {
+      // position drop content
       this.position()
+
+      // store dimensions to compare against next update
+      this._lastDrop = { offsetWidth, offsetHeight }
     }
   }
 
@@ -92,89 +98,83 @@ class Drop extends Component {
   }
 
   position = () => {
-    const { target, position, align, offset } = this.props
-    const { scrollTop, scrollLeft } = document.body
-    const targetRect = target.getBoundingClientRect()
-    const dropRect = {
-      width: this._drop.offsetWidth,
-      height: this._drop.offsetHeight
-    }
+    const { position, align, offset } = this.props
+    const { target, content, viewport } = this._getDimensions()
+    const { scrollLeft, scrollTop } = document.body
     let x = 0
     let y = 0
 
-    this._positioning()
+    //this._positioning()
     
     switch (position) {
       case 'top':
-        x = targetRect.left
-        y = targetRect.top - dropRect.height
+        x = target.left
+        y = target.top - content.height
 
         if (align === 'middle') {
-          x = targetRect.left + (targetRect.width/2) - (dropRect.width/2)
+          x = target.left + (target.width/2) - (content.width/2)
         }
         if (align === 'right') {
-          x = targetRect.right - dropRect.width
+          x = target.right - content.width
         }
         break
       case 'right':
-        x = targetRect.right
-        y = targetRect.top
+        x = target.right
+        y = target.top
 
         if (align === 'middle') {
-          y = targetRect.top + (targetRect.height/2) - (dropRect.height/2)
+          y = target.top + (target.height/2) - (content.height/2)
         }
 
         if (align === 'bottom') {
-          y = targetRect.bottom - dropRect.height
+          y = target.bottom - content.height
         }
         break
       case 'bottom':
-        x = targetRect.left
-        y = targetRect.bottom
+        x = target.left
+        y = target.bottom
 
         if (align === 'middle') {
-          x = targetRect.left + (targetRect.width/2) - (dropRect.width/2)
+          x = target.left + (target.width/2) - (content.width/2)
         }
 
         if (align === 'right') {
-          x = targetRect.right - dropRect.width
+          x = target.right - content.width
         }
         break
       case 'left':
-        x = targetRect.left - dropRect.width
-        y = targetRect.top
+        x = target.left - content.width
+        y = target.top
 
         if (align === 'middle') {
-          y = targetRect.top + (targetRect.height/2) - (dropRect.height/2)
+          y = target.top + (target.height/2) - (content.height/2)
         }
 
         if (align === 'bottom') {
-          y = targetRect.bottom - dropRect.height
+          y = target.bottom - content.height
         }
         break
     }
 
-    x += scrollTop + offset.top
-    y += scrollLeft + offset.left
+    x += scrollLeft + offset.left
+    y += scrollTop + offset.top
     
-    this.setState({x, y, dirty: false}, () => {
-      // store the last drop so we can compare changes
-      this._lastDrop = dropRect
-    })
+    this.setState({x, y, dirty: false})
   }
 
   _getDimensions() {
-    const { scrollTop, scrollLeft } = document.body
+    const { pageXOffset, pageYOffset, innerWidth, innerHeight } = window
 
-    this.setState({
-      target: target.getBoundingClientRect(),
-      content: {
-        width: this._drop.offsetWidth,
-        height: this._drop.offsetHeight
-      },
-      scrollTop,
-      scrollLeft
-    })
+    return {
+      target: this.props.target.getBoundingClientRect(),
+      content: this._drop.getBoundingClientRect(),
+      viewport: {
+        left: pageXOffset,
+        top: pageYOffset,
+        right: pageXOffset + innerWidth,
+        bottom: pageYOffset + innerHeight
+      }
+    }
   }
   
   _positioning() {
