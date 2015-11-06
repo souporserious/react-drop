@@ -36,6 +36,7 @@ class Drop extends Component {
   }
   _scrollParent = undefined
   _isPositioning = false
+  _isTicking = false
   _isMounted = false
   _lastDrop = {}
 
@@ -56,7 +57,7 @@ class Drop extends Component {
 
     // if so we need to reposition on that parent's scroll
     if (this._scrollParent !== document.body) {
-      this._scrollParent.addEventListener('scroll', this.position)
+      this._scrollParent.addEventListener('scroll', this._scrollHandler)
     }
 
     // reposition on window resize
@@ -91,7 +92,7 @@ class Drop extends Component {
     this._isMounted = false
 
     if (typeof this._scrollParent !== 'undefined') {
-      this._scrollParent.removeEventListener('scroll', this.position)
+      this._scrollParent.removeEventListener('scroll', this._scrollHandler)
     }
 
     resizeHandler.remove(this)
@@ -160,6 +161,15 @@ class Drop extends Component {
     y += scrollTop + offset.top
     
     this.setState({x, y, dirty: false})
+
+    this._isTicking = false
+  }
+
+  _scrollHandler = () => {
+    if(!this._isTicking) {
+      window.requestAnimationFrame(this.position)
+    }
+    this._isTicking = true
   }
 
   _getDimensions() {
