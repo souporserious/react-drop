@@ -6,7 +6,7 @@ import './main.scss'
 
 class App extends Component {
   state = {
-    isOpen: false,
+    isOpen: true,
     toggleHeight: false,
     position: 'top',
     align: 'middle',
@@ -14,7 +14,12 @@ class App extends Component {
   }
 
   componentDidMount() {
-    //this.forceUpdate()
+    // position example in the middle
+    this.refs.example.scrollLeft = 925
+    this.refs.example.scrollTop = 925
+    
+    // allow correct position of drop after first render
+    this.forceUpdate()
   }
 
   render() {
@@ -22,7 +27,7 @@ class App extends Component {
 
     return(
       <div className="app">
-        <button onClick={() => this.setState({isOpen: !this.state.isOpen})}>
+        <button onClick={() => this.setState({isOpen: !isOpen})}>
           Toggle Drop
         </button>
         <select
@@ -55,36 +60,40 @@ class App extends Component {
           {toggleHeight ? <span>Decrease Height</span> : <span>Increase Height</span>}
         </button>
 
-        <div style={{width: 800}}>
-          <div
-            ref="target"
-            style={{
-              width: 200,
-              height: toggleHeight ? 300 : 200,
-              margin: '50px auto',
-              background: '#b4da55',
-            }}
-          />
-          {
-            isOpen &&
-            <Drop
-              target={this.refs.target}
-              position={position}
-              align={align}
-            >
-              <div
-                style={{
-                  background: '#FF9800'
-                }}
+        <div ref="example" className="drop-example">
+          <div className="drop-scroll-content">
+            <div
+              ref="target"
+              style={{
+                width: 200,
+                height: toggleHeight ? 300 : 200,
+                padding: 12,
+                background: '#b4da55',
+              }}
+              onClick={() => this.setState({isOpen: !isOpen})}
+            />
+            {
+              isOpen &&
+              <Drop
+                target={this.refs.target}
+                position={position}
+                align={align}
               >
-                Dropped Content
-                {
-                  toggleContent &&
-                  <div>Can have state too :)</div>
-                }
-              </div>
-            </Drop>
-          }
+                <div
+                  style={{
+                    padding: 12,
+                    background: '#FF9800'
+                  }}
+                >
+                  Dropped Content
+                  {
+                    toggleContent &&
+                    <div>Can have state too :)</div>
+                  }
+                </div>
+              </Drop>
+            }
+          </div>
         </div>
       </div>
     );

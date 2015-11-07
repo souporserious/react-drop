@@ -3,15 +3,22 @@
 }
 
 body {
-  height: 2000px
+  background: grey;
 }
 
-#app {
-  //width: 450px;
-  //height: 200px;
+.drop-example {
+  width: 350px;
+  height: 350px;
   overflow: auto;
+  background: #fff;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%)
+}
+
+.drop-scroll-content {
+  width: 2000px;
+  height: 2000px;
+  padding: 1000px;
 }
