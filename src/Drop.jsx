@@ -4,6 +4,7 @@ import Travel from 'react-travel'
 import shallowCompare from 'react-addons-shallow-compare'
 import ResizeHandler from './Resize-Handler'
 import getScrollParent from './get-scroll-parent'
+import isColliding from './is-colliding'
 
 const resizeHandler = new ResizeHandler()
 
@@ -34,6 +35,7 @@ class Drop extends Component {
     x: 0,
     y: 0
   }
+
   _scrollParent = undefined
   _isPositioning = false
   _isTicking = false
@@ -41,27 +43,16 @@ class Drop extends Component {
   _lastDrop = {}
 
   componentDidMount() {
-    const { target } = this.props
-
     // keep track of us being mounted or not
     this._isMounted = true
 
-    // bail out if target isn't available yet
-    if (!target) return
-
-    // position the dropped content
-    this.position()
-
-    // check if there is a scrollable parent
-    this._scrollParent = getScrollParent(target)
-
-    // if so we need to reposition on that parent's scroll
-    if (this._scrollParent !== document.body) {
-      this._scrollParent.addEventListener('scroll', this._scrollHandler)
-    }
-
     // reposition on window resize
     resizeHandler.add(this)
+
+    // position the dropped content if target passed in
+    if (this.props.target) {
+      this.position()
+    }
   }
 
   componentWillReceiveProps({children}) {
@@ -77,10 +68,18 @@ class Drop extends Component {
   componentDidUpdate() {
     const { offsetWidth, offsetHeight } = this._drop
 
+    // set scroll parent if it hasn't been yet
+    // could have been due to target not being available yet
+    if (!this._scrollParent) {
+      this._setScrollParent()
+    }
+
+    // determine if we need to update the position of the
+    // dropped content or not
     if (this.state.dirty ||
         offsetWidth !== this._lastDrop.offsetWidth &&
         offsetHeight !== this._lastDrop.offsetHeight) {
-      // position drop content
+      // position content relative to target
       this.position()
 
       // store dimensions to compare against next update
@@ -102,6 +101,7 @@ class Drop extends Component {
     const { position, align, offset } = this.props
     const { target, content, viewport } = this._getDimensions()
     const { scrollLeft, scrollTop } = document.body
+    const colliding = isColliding(this._scrollParent, this.props.target, this._drop)
     let x = 0
     let y = 0
 
@@ -165,6 +165,16 @@ class Drop extends Component {
     this._isTicking = false
   }
 
+  _setScrollParent = () => {
+    // check if there is a scrollable parent
+    this._scrollParent = getScrollParent(this.props.target)
+
+    // if so we need to reposition on that parent's scroll
+    if (this._scrollParent !== document.body) {
+      this._scrollParent.addEventListener('scroll', this._scrollHandler)
+    }
+  }
+
   _scrollHandler = () => {
     if(!this._isTicking) {
       requestAnimationFrame(this.position)
@@ -214,14 +224,14 @@ class Drop extends Component {
       pointerEvents: positioning ? 'none' : 'auto'
     }
     
-    return(
+    return (
       <Travel getNode={n => this._drop = n} style={style}>
         {
           cloneElement(
             Children.only(children),
             {
               onWheel: (e) => {
-                this.setState({positioning: true})
+                this._positioning()
                 onWheel && onWheel(e)
               }
             }
