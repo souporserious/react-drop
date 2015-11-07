@@ -16,7 +16,8 @@ class Drop extends Component {
     offset: PropTypes.shape({
       top: PropTypes.number,
       left: PropTypes.number
-    })
+    }),
+    zIndex: PropTypes.number
   }
 
   static defaultProps = {
@@ -25,7 +26,8 @@ class Drop extends Component {
     offset: {
       top: 0,
       left: 0
-    }
+    },
+    zIndex: 10000
   }
 
   state = {
@@ -215,14 +217,14 @@ class Drop extends Component {
   }
 
   render() {
-    const { children, onWheel } = this.props
+    const { children, zIndex, onWheel } = this.props
     const { positioning, x, y} = this.state
     const style = {
       position: 'absolute',
       top: 0,
       left: 0,
       transform: `translate(${x}px, ${y}px)`,
-      zIndex: 10000,
+      zIndex,
       pointerEvents: positioning ? 'none' : 'auto'
     }
     
