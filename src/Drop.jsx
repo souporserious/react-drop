@@ -49,8 +49,10 @@ class Drop extends Component {
     // reposition on window resize
     resizeHandler.add(this)
 
-    // position the dropped content if target passed in
+    // get scroll parent and position the
+    // dropped content if target passed in
     if (this.props.target) {
+      this._setScrollParent()
       this.position()
     }
   }
