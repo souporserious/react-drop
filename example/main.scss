@@ -3,14 +3,17 @@
 }
 
 body {
+  height: 2000px;
+  text-align: center;
   background: grey;
 }
 
 .drop-example {
   width: 350px;
   height: 350px;
-  overflow: auto;
+  //margin-top: 500px;
   background: #fff;
+  overflow: auto;
   position: absolute;
   top: 50%;
   left: 50%;

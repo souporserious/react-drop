@@ -9,7 +9,7 @@ class App extends Component {
     isOpen: true,
     toggleHeight: false,
     position: 'top',
-    align: 'middle',
+    align: 'left',
     toggleContent: false
   }
 
@@ -78,6 +78,16 @@ class App extends Component {
                 target={this.refs.target}
                 position={position}
                 align={align}
+                onCollision={collisions => {
+                  if (this.state.position !== 'bottom' &&
+                      collisions.indexOf('top') > -1) {
+                    this.setState({position: 'bottom'})
+                  }
+                  if (this.state.position !== 'top' &&
+                      collisions.indexOf('bottom') > -1) {
+                    this.setState({position: 'top'})
+                  }
+                }}
               >
                 <div
                   style={{
