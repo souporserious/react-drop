@@ -17,7 +17,8 @@ class Drop extends Component {
       top: PropTypes.number,
       left: PropTypes.number
     }),
-    zIndex: PropTypes.number
+    zIndex: PropTypes.number,
+    onCollision: PropTypes.func
   }
 
   static defaultProps = {
@@ -27,7 +28,8 @@ class Drop extends Component {
       top: 0,
       left: 0
     },
-    zIndex: 10000
+    zIndex: 10000,
+    onCollision: () => null
   }
 
   state = {
@@ -105,7 +107,6 @@ class Drop extends Component {
     const { position, align, offset } = this.props
     const { target, content, viewport } = this._getDimensions()
     const { scrollLeft, scrollTop } = document.body
-    const colliding = isColliding(this._scrollParent, this.props.target, this._drop)
     let x = 0
     let y = 0
 
@@ -173,17 +174,23 @@ class Drop extends Component {
     // check if there is a scrollable parent
     this._scrollParent = getScrollParent(this.props.target)
 
-    // if so we need to reposition on that parent's scroll
-    if (this._scrollParent !== document.body) {
-      this._scrollParent.addEventListener('scroll', this._scrollHandler)
-    }
+    // if so we need to reposition when that parent scrolls
+    this._scrollParent.addEventListener('scroll', this._scrollHandler)
   }
 
   _scrollHandler = () => {
-    if(!this._isTicking) {
-      requestAnimationFrame(this.position)
+    const colliding = isColliding(this._scrollParent, this._drop)
+
+    if (colliding.length > 0) {
+      this.props.onCollision(colliding)
     }
-    this._isTicking = true
+
+    if (this._scrollParent !== document.body) {
+      if (!this._isTicking) {
+        requestAnimationFrame(this.position)
+      }
+      this._isTicking = true
+    }
   }
 
   _getDimensions() {
@@ -209,7 +216,7 @@ class Drop extends Component {
       
       // stop positioning after 350ms, used to disable pointer events
       setTimeout(() => {
-        if(!this._isPositioning && this._isMounted) {
+        if (!this._isPositioning && this._isMounted) {
           this.setState({positioning: false})
         }
       }, 350)
